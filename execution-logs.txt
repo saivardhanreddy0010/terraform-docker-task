@@ -1,0 +1,330 @@
+# Terraform Docker Task - Execution Logs
+
+## 1. Check Terraform Version
+
+Command:
+
+```powershell
+terraform version
+```
+
+Result:
+
+```text
+Terraform v1.15.8
+```
+
+---
+
+## 2. Check Docker Version
+
+Command:
+
+```powershell
+docker --version
+```
+
+Result:
+
+```text
+Docker version 29.6.2
+```
+
+---
+
+## 3. Format Terraform Configuration
+
+Command:
+
+```powershell
+terraform fmt
+```
+
+Result:
+
+```text
+Terraform configuration formatted successfully.
+```
+
+---
+
+## 4. Initialize Terraform
+
+Command:
+
+```powershell
+terraform init
+```
+
+Result:
+
+```text
+Terraform has been successfully initialized!
+```
+
+Docker provider:
+
+```text
+kreuzwerker/docker v3.9.0
+```
+
+---
+
+## 5. Validate Terraform Configuration
+
+Command:
+
+```powershell
+terraform validate
+```
+
+Result:
+
+```text
+Success! The configuration is valid.
+```
+
+---
+
+## 6. Create Terraform Plan
+
+Command:
+
+```powershell
+terraform plan
+```
+
+Result:
+
+```text
+Plan: 2 to add, 0 to change, 0 to destroy.
+```
+
+Terraform planned to create:
+
+```text
+docker_image.nginx
+docker_container.nginx
+```
+
+---
+
+## 7. Terraform Apply
+
+Command:
+
+```powershell
+terraform apply
+```
+
+Result:
+
+```text
+Apply complete! Resources: 2 added, 0 changed, 0 destroyed.
+```
+
+Docker container created:
+
+```text
+terraform-nginx
+```
+
+Port mapping:
+
+```text
+localhost:8081 -> container port 80
+```
+
+---
+
+## 8. Verify Docker Container
+
+Command:
+
+```powershell
+docker ps
+```
+
+Result:
+
+```text
+terraform-nginx
+nginx
+0.0.0.0:8081->80/tcp
+```
+
+The Nginx container was running successfully.
+
+---
+
+## 9. Check Docker Images
+
+Command:
+
+```powershell
+docker images
+```
+
+Result:
+
+```text
+nginx:latest
+```
+
+The required Nginx Docker image was present.
+
+---
+
+## 10. Check Terraform State
+
+Command:
+
+```powershell
+terraform state list
+```
+
+Result:
+
+```text
+docker_container.nginx
+docker_image.nginx
+```
+
+Terraform was managing both the Docker container and Docker image.
+
+---
+
+## 11. Inspect Terraform Resource
+
+Command:
+
+```powershell
+terraform state show docker_container.nginx
+```
+
+Result:
+
+```text
+Container name: terraform-nginx
+Image: nginx:latest
+Internal port: 80
+External port: 8081
+```
+
+---
+
+## 12. Troubleshooting - Port Conflict
+
+During the first Terraform apply, host port `8080` was already being used.
+
+Command:
+
+```powershell
+netstat -ano | findstr :8080
+```
+
+The port was being used by a Java process.
+
+Command:
+
+```powershell
+tasklist | findstr 7092
+```
+
+Result:
+
+```text
+java.exe
+```
+
+Instead of stopping the Java application, the Terraform configuration was changed to use port `8081`.
+
+After this change, Terraform apply completed successfully.
+
+---
+
+## 13. Terraform Destroy
+
+Command:
+
+```powershell
+terraform destroy -auto-approve
+```
+
+Result:
+
+```text
+Destroy complete! Resources: 1 destroyed.
+```
+
+The Terraform-managed Nginx image was successfully removed.
+
+---
+
+## 14. Final Terraform State Verification
+
+Command:
+
+```powershell
+terraform state list
+```
+
+Result:
+
+```text
+No resources listed.
+```
+
+Terraform state was empty after destruction.
+
+---
+
+## 15. Final Docker Container Verification
+
+Command:
+
+```powershell
+docker ps
+```
+
+Result:
+
+```text
+No running containers.
+```
+
+The Terraform-managed Nginx container was no longer running.
+
+---
+
+## 16. Final Docker Image Verification
+
+Command:
+
+```powershell
+docker images nginx
+```
+
+Result:
+
+```text
+No nginx image present.
+```
+
+The Terraform-managed Nginx image was successfully removed.
+
+---
+
+# Final Result
+
+Terraform was successfully used to:
+
+1. Initialize the Docker provider.
+2. Validate the Terraform configuration.
+3. Create an execution plan.
+4. Provision an Nginx Docker image.
+5. Create and run an Nginx Docker container.
+6. Inspect Terraform state.
+7. Troubleshoot a host port conflict.
+8. Destroy the Terraform-managed infrastructure.
+9. Verify that Terraform state and Docker resources were cleaned up.
